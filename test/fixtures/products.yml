@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ad_id: 1
+  name: MyString
+  url: MyString
+  city: MyString
+  year: 1
+  price: 9.99
+  photo_url: MyString
+  description: MyText
+
+two:
+  ad_id: 1
+  name: MyString
+  url: MyString
+  city: MyString
+  year: 1
+  price: 9.99
+  photo_url: MyString
+  description: MyText
