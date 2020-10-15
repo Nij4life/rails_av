@@ -1,10 +1,6 @@
 <h1>SHOW</h1>
-<div>
-  <p>
-    <%= @category.inspect %>
-  </p>
-  <p><%= link_to 'Update category', category_path %></p>
-</div>
+
+<p><%= @category.inspect %></p>
 
 <ul class="items">
   <%= render @category.products %>

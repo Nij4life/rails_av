@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_13_124405) do
+ActiveRecord::Schema.define(version: 2020_10_15_141356) do
 
   create_table "categories", force: :cascade do |t|
     t.string "name"
@@ -39,4 +39,16 @@ ActiveRecord::Schema.define(version: 2020_10_13_124405) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "tasks", force: :cascade do |t|
+    t.boolean "recursive"
+    t.boolean "skip_products"
+    t.string "url_type"
+    t.string "state"
+    t.integer "category_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["category_id"], name: "index_tasks_on_category_id"
+  end
+
+  add_foreign_key "tasks", "categories"
 end

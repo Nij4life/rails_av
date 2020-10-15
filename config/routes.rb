@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
-  resources :categories do
-    resources :products
-  end
+  # get 'welcome/index'
+
+  post '/tasks', to: 'tasks#create'
+  delete '/tasks', to: 'tasks#destroy'
+
+  resources :categories
   root 'categories#index'
 end
