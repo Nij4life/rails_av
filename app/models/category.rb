@@ -1,5 +1,5 @@
 class Category < ApplicationRecord
-  validates :name, presence: true
-  validates :url, presence: true
-  has_and_belongs_to_many :products
+  has_and_belongs_to_many :products, dependent: :destroy
+  # validates :name, presence: true
+  # validates :url, presence: true
 end

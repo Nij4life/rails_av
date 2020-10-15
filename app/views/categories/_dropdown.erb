@@ -1,0 +1,3 @@
+<%= collection_select(:product, :category_id, @categories, :id, :name, prompt: 'категории') %>
+
+<!-- select("post", "category_id", @categories.collect {|r| [ r.name, r.id ] }, { include_blank: 'категории' }) -->
