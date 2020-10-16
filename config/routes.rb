@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
-  # get 'welcome/index'
+  # post 'tasks' => 'tasks#create'
 
-  post '/tasks', to: 'tasks#create'
-  delete '/tasks', to: 'tasks#destroy'
+  resources :categories do
+    resource :tasks, only: %i[new, create destroy] # route new не появляеться
+  end
 
-  resources :categories
   root 'categories#index'
 end

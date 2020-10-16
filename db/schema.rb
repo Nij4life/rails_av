@@ -12,43 +12,43 @@
 
 ActiveRecord::Schema.define(version: 2020_10_15_141356) do
 
-  create_table "categories", force: :cascade do |t|
-    t.string "name"
-    t.string "url"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+  create_table 'categories', force: :cascade do |t|
+    t.string 'name'
+    t.string 'url'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
   end
 
-  create_table "categories_products", id: false, force: :cascade do |t|
-    t.integer "category_id", null: false
-    t.integer "product_id", null: false
-    t.index ["category_id", "product_id"], name: "index_categories_products_on_category_id_and_product_id"
-    t.index ["product_id", "category_id"], name: "index_categories_products_on_product_id_and_category_id"
+  create_table 'categories_products', id: false, force: :cascade do |t|
+    t.integer 'category_id', null: false
+    t.integer 'product_id', null: false
+    t.index ['category_id', 'product_id'], name: 'index_categories_products_on_category_id_and_product_id'
+    t.index ['product_id', 'category_id'], name: 'index_categories_products_on_product_id_and_category_id'
   end
 
-  create_table "products", force: :cascade do |t|
-    t.integer "ad_id"
-    t.string "name"
-    t.string "url"
-    t.string "city"
-    t.integer "year"
-    t.decimal "price"
-    t.string "photo_url"
-    t.text "description"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+  create_table 'products', force: :cascade do |t|
+    t.integer 'ad_id'
+    t.string 'name'
+    t.string 'url'
+    t.string 'city'
+    t.integer 'year'
+    t.decimal 'price'
+    t.string 'photo_url'
+    t.text 'description'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
   end
 
-  create_table "tasks", force: :cascade do |t|
-    t.boolean "recursive"
-    t.boolean "skip_products"
-    t.string "url_type"
-    t.string "state"
-    t.integer "category_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["category_id"], name: "index_tasks_on_category_id"
+  create_table 'tasks', force: :cascade do |t|
+    t.boolean 'recursive'
+    t.boolean 'skip_products'
+    t.string 'url_type'
+    t.string 'state'
+    t.integer 'category_id', null: false
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['category_id'], name: 'index_tasks_on_category_id'
   end
 
-  add_foreign_key "tasks", "categories"
+  add_foreign_key 'tasks', 'categories'
 end

@@ -1,22 +1,32 @@
 class TasksController < ApplicationController
+
+  def new # не появляется в routes
+    @category = Category.find(params[:category_id])
+  end
+
   def create
-    @task = Task.new(task_params)
-    if @task.save
-      # do something
-    else
-      # do something
-    end
+    @category = Category.find(params[:category_id])
+
+    # connection 'one to one'. I catch an error when i do build_task because @task.id is exist
+    return render('wrong') if @category.task
+
+    @task = @category.build_task({ skip_products: false, recursive: true, state: 'pending', url_type: 'category' })
+    @task.save ? redirect_to(categories_path) : render('wrong')
   end
 
   def destroy
-    @task = Task.find(task_params)
-    # do something
-    @task.destroy
+    if params[:category_id] == '0'
+      Task.delete_all
+    else
+      @category = Category.find(params[:category_id])
+      @task.destroy
+    end
+    redirect_to(categories_path)
   end
 
   private
 
   def task_params
-    { id: 25 }
+    # params.require(:task).permit(:title, :text)
   end
 end
