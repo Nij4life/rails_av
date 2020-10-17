@@ -1,4 +1,6 @@
-class Product < ApplicationRecord
+require_relative '../../utils/glue'
+
+class Product < Glue::ApplicationRecord
   validates :ad_id, presence: true
   validates :name, presence: true
   validates :url, presence: true

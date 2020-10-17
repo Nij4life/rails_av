@@ -1,4 +1,6 @@
-class Task < ApplicationRecord
+require_relative '../../utils/glue'
+
+class Task < Glue::ApplicationRecord
   belongs_to :category
 
   # validates :recursive, presence: true
