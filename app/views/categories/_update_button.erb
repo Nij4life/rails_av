@@ -1,0 +1,3 @@
+<% unless @category.task || (@category.updated_at > Time.now - 3.hours) %>
+  <span class='category__update'><%= link_to 'update', category_tasks_path(@category), method: :post %></span>
+<% end %>

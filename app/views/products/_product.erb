@@ -1,18 +1,19 @@
 
-<li class='item'>
-  <div>
-    <img
-      class='item__image'
-      alt='image car'
-      src=<%= product.photo_url ? product.photo_url : '' %> />
-  </div>
-  <ul class='item__info'>
-    <li><span>ad_id</span>  <%= product.ad_id %></li>
-    <li><span>more information:</span><a href=' <%= product.url %>'>link</a></li>
-    <li><span>model:</span>  <%= product.name %> </li>
-    <li><span>year:</span>  <%= product.year %> </li>
-    <li><span>price:</span>  <%= product.price %>$</li>
-    <li><span>city:</span>  <%= product.city %> </li>
-    <li><span>description:</span>  <%= product.description %> </li>
+<li class='product'>
+
+  <img
+    class='product__image'
+    alt='image car'
+    src=<%= product.photo_url ? product.photo_url : '' %> />
+
+  <ul class='product__info'>
+    <li class='product__info_ad_id'><span>ad_id</span>  <%= product.ad_id %></li>
+    <li class='product__info_url'><span>more information:</span><a href=' <%= product.url %>'>link</a></li>
+    <li class='product__info_name'><span>model:</span>  <%= product.name %> </li>
+    <li class='product__info_year'><span>year:</span>  <%= product.year %> </li>
+    <li class='product__info_price'><span>price:</span>  <%= product.price %>$</li>
+    <li class='product__info_city'><span>city:</span>  <%= product.city %> </li>
+    <% description = product.description && product.description.size > 40 ? product.description[1..40]+'...' : product.description %>
+    <li class='product__info_description'><span>description:</span> <%= description %></li>
   </ul>
 </li>

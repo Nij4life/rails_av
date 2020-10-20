@@ -10,8 +10,8 @@ class TasksController < ApplicationController
     # connection 'one to one'. I catch an error when i do build_task because @task.id is exist
     return render('wrong') if @category.task
 
-    @task = @category.build_task({ skip_products: false, recursive: false, state: 'pending', url_type: 'category' })
-    @task.save ? redirect_to(categories_path) : render('wrong')
+    @task = @category.build_task({ skip_products: false, recursive: true, state: 'pending', url_type: 'category' })
+    @task.save ? redirect_to(category_path(@category)) : render('wrong')
   end
 
   def destroy

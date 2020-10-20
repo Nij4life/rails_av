@@ -1,7 +1,7 @@
 ID, URL, PHOTOS, YEAR, PRICE, CITY, NAME, PUBLIC_URL = 'id', 'url', 'photos', 'year', 'price', 'city', 'name', 'publicUrl'
 DESCRIPTION, PROPERTIES, SMALL, VALUE, USD, AMOUNT = 'description', 'properties', 'small', 'value', 'usd', "amount"
 SHORT_LOCATION_NAME, INITIAL_VALUE, BRAND, MODEL, PAGE = 'shortLocationName', 'initialValue', 'brand', 'model', 'page'
-JOIN_ARROW, ADVERTS, PAGE_COUNT = ' -> ', 'adverts', 'pageCount'
+JOIN_ARROW, ADVERTS, PAGE_COUNT, BRANDS = ' -> ', 'adverts', 'pageCount', 'brands'
 
 DEFAULT_HEADERS = {
     'Accept' => '*/*',

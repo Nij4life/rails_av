@@ -2,13 +2,13 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: https://sass-lang.com/
 
-.items {
+.products {
   display: flex;
   flex-wrap: wrap;
   list-style: none;
 }
 
-.item {
+.product {
   display: flex;
   max-width: 400px;
   margin: 10px;

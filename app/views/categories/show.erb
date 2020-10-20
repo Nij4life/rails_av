@@ -1,9 +1,17 @@
-<h1>SHOW</h1>
+<div class="category_products">
+  <%=  link_to '⇐', categories_path,  class: 'link_back' %>
 
-<p><%= @category.inspect %></p>
+  <p class="category">
+    <span class="category__name"><%= @category.name %></span>
+    <span class="category__count"><%= @category.products.size %></span>
+    <span class='category__update_info'>(last update: <%= @category.updated_at.getlocal.strftime('%H:%M   %d.%m.%Y') %>)</span>
+    <%= render 'update_button' %>
+  </p>
 
-<ul class="items">
-  <%= render @category.products %>
-</ul>
+  <ul class="products">
+    <%= render @category.products %>
+  </ul>
+</div>
 
-<%= link_to 'Back', categories_path %>
+<%=  link_to '⇐', categories_path,  class: 'link_back' %>
+<!--# last update == Time.new but in the site time == time - 3 hours !-->

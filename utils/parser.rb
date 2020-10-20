@@ -43,24 +43,31 @@ class Parser
     info[CITY] = product[SHORT_LOCATION_NAME]
     info[NAME] = product[PROPERTIES].select { |el| [2, 3, 4].include?(el[ID]) }.map { |el| el[VALUE] }.join(' ')
     info[DESCRIPTION] = product[DESCRIPTION]
+    info
+  end
+
+  def get_id_category(response_category)
+    str = response_category[INITIAL_VALUE]
+    str.scan(/=\d+/).map { |id| id[/\d+/] }
   end
 
   def add_category(category_name, response_category)
-    str = response_category[INITIAL_VALUE]
-    id_list = str.scan(/=\d+/).map { |id| id[/\d+/] }
+    id_list = get_id_category(response_category) # id_list because id can be: brand or brand, model
 
-    part_request_body = id_list.size == 1 ?
-                       [{ NAME => BRAND, VALUE => id_list[0] }] :
-                       [{ NAME => BRAND, VALUE => id_list[0] }, { NAME => MODEL, VALUE => id_list[1] }]
+    part_request_body = if id_list.size == 1
+                          [{ NAME => BRAND, VALUE => id_list[0] }]
+                        else
+                          [{ NAME => BRAND, VALUE => id_list[0] }, { NAME => MODEL, VALUE => id_list[1] }]
+                        end
 
-    category = { 'part_request_body': part_request_body, products: [] }
+    category = {'part_request_body': part_request_body, products: []}
     @categories.merge!(category_name => category)
     category
   end
 
   def get_category_name(page)
     nodes = query_get_elements(page, "//li[@class='breadcrumb-item']").to_a
-    nodes.size < 2 ? (return '') : nodes.shift
+    nodes.size < 2 ? (return 'All') : nodes.shift
 
     extract_name = -> (*arr) { arr.map { |nok| get_value(nok, './/span').gsub('Купить ', '') }.join(JOIN_ARROW) }
 
@@ -76,10 +83,10 @@ class Parser
 
     category = add_category(category_name, response_category) unless @categories.include?(category_name)
 
-    return if response_category[ADVERTS].empty? # Because do not somethings
+    return if response_category[ADVERTS].empty? # Because do not somethingsq
 
     extract_products(response_category, category) unless @skip_products
-    update_categories(category_name)
+    update_category(category_name, url)
 
     if @recursive
       links = response_category['seo']['links'].map { |cat| cat[URL] }
@@ -87,10 +94,24 @@ class Parser
     end
   end
 
-  def update_categories(category_name)
-    cat = Category.find_by_name(category_name) # или подругому?
-    if cat
-      # add products
+  def create_product(info)
+    # info >> [ID] [URL] [PHOTOS] [YEAR] [PRICE] [CITY] [NAME] [DESCRIPTION]
+    { ad_id: info[ID], name: info[NAME], url: info[URL], city: info[CITY], year: info[YEAR],
+      price: info[PRICE], photo_url: info[PHOTOS], description: info[DESCRIPTION] }
+  end
+
+  def update_category(category_name, url)
+    cat = Category.find_by_name(category_name) || Category.new(name: category_name, url: url)
+    cat.updated_at = Time.now
+    cat.save
+
+    @categories[category_name][:products].each do |info|
+      cat.products.create(create_product(info)) unless cat.products.exists?(ad_id: info[ID])
+    rescue => e
+      # был случай продукта-теста на сайте. он не прошел validate базы и exception
+      puts e.message
+      puts e.backtrace
+      binding.pry
     end
   end
 
@@ -102,18 +123,20 @@ class Parser
   end
 
   def create_post_body(page_number, part_request_body)
-    { PAGE => page_number,
-      PROPERTIES => [
-        { NAME => BRAND, 'property' => 5, VALUE => [part_request_body] },
-        { NAME => 'price_currency', VALUE => 2 }
-      ] }
+    {PAGE => page_number,
+     PROPERTIES => [
+         {NAME => BRANDS, 'property' => 5, VALUE => [part_request_body]},
+         {NAME => 'price_currency', VALUE => 2}
+     ],
+     "sorting" => 1
+    }
   end
 
   def request_products(page_number, part_request_body)
     post_body = create_post_body(page_number, part_request_body)
 
-    JSON Curl.post('https://api.av.by/offer-types/cars/filters/main/apply',
-                   post_body.to_json) { |curl| curl.headers = DEFAULT_HEADERS }.body_str
+    res = JSON Curl.post('https://api.av.by/offer-types/cars/filters/main/apply',
+                         post_body.to_json) { |curl| curl.headers = DEFAULT_HEADERS }.body_str
   end
 
   def extract_products(response_category, category)
@@ -124,9 +147,14 @@ class Parser
       end_range = response_category[PAGE_COUNT]
 
       (start_range..end_range).step do |i|
-        products += request_products(i, category[:part_request_body])[ADVERTS]
+        res = request_products(i, category[:part_request_body])
+        products += res[ADVERTS] if res.presence
+      rescue
+        binding.pry
         # тут была странная ошибка. на audi 121 и выше стр. приходил result['adverts'] == []
+        # когда достигли лимита продуктов 3000
       end
+
     end
 
     category[:products] = products.map { |product| get_info(product) }

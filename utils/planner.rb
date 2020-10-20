@@ -25,11 +25,12 @@ class Planner
 
   def check_task
     task = Task.take
-    if task
-      category = find_category(task[:category_id])
-      do_task(url: category[:url], url_type: 'category', recursive: task[:recursive], skip_products: task[:skip_products])
-      task.delete
-    end
+
+    return false unless task
+
+    category = find_category(task[:category_id])
+    do_task(url: category[:url], url_type: 'category', recursive: task[:recursive], skip_products: task[:skip_products])
+    task.delete
   end
 
 end
@@ -37,11 +38,16 @@ end
 planner = Planner.new
 
 loop do
-  puts '...check the task every 10 seconds...'
+  puts '...check the task every 30 seconds...'
   planner.check_task
-  sleep(10)
+  sleep(30)
 end
 
 # ActiveRecord::Base.connection.execute('select * from products')
 #
 # ruby parser.rb -u https://cars.av.by -t categories -r true -s true
+#
+# connection adapter
+# ActiveRecord::Base.connection
+# execute(sql, name = nil) public
+# Выполняет инструкцию SQL в контексте этого соединения и возвращает необработанный результат от адаптера соединения.

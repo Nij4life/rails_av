@@ -1,17 +1,20 @@
 <h1>Categories#index</h1>
+
 <ul class='categories'>
+  <% @category = @categories.find {|cat| cat.name == 'All'} %>
+  <li class='category'>
+    <span class="category__name"><%= @category.name %></span>
+    <span class="category__count"><%= @category.products.size %></span>
+    <%= render 'update_button' %>
+ <!--   <%# unless all.task  %>
+      <%#= link_to 'update', category_tasks_path(all), class: 'category__update', method: :post %></span>
+       зашло по кнопке, но на пустую show. На скачку отправило... там @category, а тут не отправляю
+    <%# end %>-->
+  </li>
   <% @categories.each do |category| %>
-    <li class='category'>
+    <% next if category.name == 'All' %>
 
-      <span class="category__name"></span><%= link_to "#{category.name}", category_path(category) %></span>
-
-      <span class='category__update_info'>(last update: <%= category.updated_at.strftime('%d.%m.%Y') %>)</span>
-
-      <% unless category.task %>
-        <span class='category__update'><%= link_to 'update', category_tasks_path(category), method: :post %></span>
-      <% end %>
-    </li>
-
+    <%= render @category = category %>
   <% end %>
 </ul>
 
