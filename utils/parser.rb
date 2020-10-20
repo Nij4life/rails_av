@@ -106,7 +106,7 @@ class Parser
     cat.save
 
     @categories[category_name][:products].each do |info|
-      cat.products.create(create_product(info)) unless cat.products.exists?(ad_id: info[ID])
+      cat.products.create(create_product(info)) unless Product.exists?(ad_id: info[ID])
     rescue => e
       # был случай продукта-теста на сайте. он не прошел validate базы и exception
       puts e.message

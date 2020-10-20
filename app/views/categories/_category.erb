@@ -1,6 +1,10 @@
 <li class='category'>
-  <span class="category__name"><%= link_to "#{@category.name}", category_path(@category) %></span>
+
+    <% if @category.name == 'All' %>
+      <span class="category__name"><%= @category.name %></span>
+    <% else %>
+      <%= link_to "#{@category.name}", category_path(@category), class: 'category__name' %>
+    <% end %>
+
   <span class="category__count"><%= @category.products.size %></span>
-  <!--      <span><%#= category.name %></span>-->
-  <!--      <span class="category__name"><%#= link_to "Show", category_path(category) %></span>-->
 </li>
