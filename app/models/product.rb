@@ -10,4 +10,5 @@ class Product < Glue::ApplicationRecord
   #validates :price, { numericality: {only_integer: true} }
 end
 
+# add indexing for ad_id.
 # Не нравиться переделанные [PHOTOS]. Теперь там 1на photo_url!

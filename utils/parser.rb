@@ -60,7 +60,7 @@ class Parser
                           [{ NAME => BRAND, VALUE => id_list[0] }, { NAME => MODEL, VALUE => id_list[1] }]
                         end
 
-    category = {'part_request_body': part_request_body, products: []}
+    category = { 'part_request_body': part_request_body, products: [] }
     @categories.merge!(category_name => category)
     category
   end
@@ -86,7 +86,7 @@ class Parser
     return if response_category[ADVERTS].empty? # Because do not somethingsq
 
     extract_products(response_category, category) unless @skip_products
-    update_category(category_name, url)
+    update_db(category_name, url)
 
     if @recursive
       links = response_category['seo']['links'].map { |cat| cat[URL] }
@@ -96,17 +96,37 @@ class Parser
 
   def create_product(info)
     # info >> [ID] [URL] [PHOTOS] [YEAR] [PRICE] [CITY] [NAME] [DESCRIPTION]
-    { ad_id: info[ID], name: info[NAME], url: info[URL], city: info[CITY], year: info[YEAR],
-      price: info[PRICE], photo_url: info[PHOTOS], description: info[DESCRIPTION] }
+    Product.create(ad_id: info[ID], name: info[NAME], url: info[URL], city: info[CITY], year: info[YEAR],
+                   price: info[PRICE], photo_url: info[PHOTOS], description: info[DESCRIPTION])
+  rescue => e
+    # был случай продукта-теста на сайте. он не прошел validate базы и exception
+    puts e.message
+    puts e.backtrace
+    binding.pry
   end
 
-  def update_category(category_name, url)
+  def update_or_create_category(category_name, url)
     cat = Category.find_by_name(category_name) || Category.new(name: category_name, url: url)
-    cat.updated_at = Time.now
+    cat.updated_at = Time.now # without this line cat.save don't update date
     cat.save
+  end
+
+  def get_categories(category_name)
+    name = category_name.split(JOIN_ARROW).shift.strip
+    Category.where('name LIKE ?', "%#{name}%")
+  end
+
+  def update_db(category_name, url)
+    update_or_create_category(category_name, url)
+    categories = get_categories(category_name)
 
     @categories[category_name][:products].each do |info|
-      cat.products.create(create_product(info)) unless Product.exists?(ad_id: info[ID])
+      unless Product.exists?(ad_id: info[ID])
+
+        product = create_product(info)
+        product.categories = categories
+      end
+
     rescue => e
       # был случай продукта-теста на сайте. он не прошел validate базы и exception
       puts e.message
@@ -123,13 +143,12 @@ class Parser
   end
 
   def create_post_body(page_number, part_request_body)
-    {PAGE => page_number,
-     PROPERTIES => [
-         {NAME => BRANDS, 'property' => 5, VALUE => [part_request_body]},
-         {NAME => 'price_currency', VALUE => 2}
-     ],
-     "sorting" => 1
-    }
+    { PAGE => page_number,
+      PROPERTIES => [
+        { NAME => BRANDS, 'property' => 5, VALUE => [part_request_body] },
+        { NAME => 'price_currency', VALUE => 2 }
+      ],
+      'sorting' => 1}
   end
 
   def request_products(page_number, part_request_body)
@@ -150,11 +169,9 @@ class Parser
         res = request_products(i, category[:part_request_body])
         products += res[ADVERTS] if res.presence
       rescue
-        binding.pry
         # тут была странная ошибка. на audi 121 и выше стр. приходил result['adverts'] == []
         # когда достигли лимита продуктов 3000
       end
-
     end
 
     category[:products] = products.map { |product| get_info(product) }
